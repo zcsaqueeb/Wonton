@@ -773,14 +773,24 @@ class Wonton:
         
         if token:
             user = self.user_data(token)
+            if not user:
+                self.log(
+                    f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} Query Id May Expired {Style.RESET_ALL}"
+                    f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                )
+                return
+            
             if user:
                 self.log(
                     f"{Fore.MAGENTA+Style.BRIGHT}[ Account{Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT} {user['firstName']} {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}] [ Balance{Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT} {user['tokenBalance']} $WTON {Style.RESET_ALL}"
-                    f"{Fore.MAGENTA+Style.BRIGHT}] [ Ticket{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {user['ticketCount']} {Style.RESET_ALL}"
+                    f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {user['withdrawableBalance']} $TON {Style.RESET_ALL}"
+                    f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {user['withdrawableUSDTBalance']} $USDT {Style.RESET_ALL}"
                     f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                 )
                 time.sleep(1)
@@ -1160,7 +1170,7 @@ class Wonton:
                             self.log(
                                 f"{Fore.MAGENTA+Style.BRIGHT}[ Play Game{Style.RESET_ALL}"
                                 f"{Fore.RED+Style.BRIGHT} Isn't Started {Style.RESET_ALL}"
-                                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                                f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}               "
                             )
                             break
 
@@ -1237,7 +1247,7 @@ class Wonton:
                             fuse = self.fuse_items(token, fusion_id)
                             if fuse:
                                 reward_value = fusion['shopItem']['value']
-                                reward_type = '$USDT' if fusion['shopItem']['sellToken'] == 0 else '$TON'
+                                reward_type = '$USDT' if fusion['shopItem']['sellToken'] == 1 else '$TON'
                                 self.log(
                                     f"{Fore.MAGENTA+Style.BRIGHT}[ Fusion Skins{Style.RESET_ALL}"
                                     f"{Fore.WHITE+Style.BRIGHT} {fusion['shopItem']['name']} {Style.RESET_ALL}"
@@ -1415,10 +1425,32 @@ class Wonton:
                         f"{Fore.RED+Style.BRIGHT} Data Is None {Style.RESET_ALL}"
                         f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                     )
+                time.sleep(1)
+
+                skins = self.skins_list(token)
+                if skins:
+                    have_ton = sum(float(item["value"]) * item["inventory"]  for item in skins if item["sellToken"] == 0)
+                    have_usdt = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1)
+
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Info:{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} This Account Have {Style.RESET_ALL}"
+                        f"{Fore.CYAN+Style.BRIGHT}{have_ton:.4f} $TON{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} and {Style.RESET_ALL}"
+                        f"{Fore.CYAN+Style.BRIGHT}{have_usdt:.4f} $USDT{Style.RESET_ALL}"
+                        f"{Fore.WHITE+Style.BRIGHT} From Wonton's Skins {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
+                else:
+                    self.log(
+                        f"{Fore.MAGENTA+Style.BRIGHT}[ Skin{Style.RESET_ALL}"
+                        f"{Fore.RED+Style.BRIGHT} Data Is None {Style.RESET_ALL}"
+                        f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
+                    )
 
     def main(self):
         try:
-            with open("query.txt", "r") as file:
+            with open("data.txt", "r") as file:
                 queries = [line.strip() for line in file if line.strip()]
 
             purchase_box = self.question()
