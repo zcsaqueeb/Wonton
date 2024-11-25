@@ -762,9 +762,11 @@ class Wonton:
                     user = self.user_data(token)
                     skins = self.skins_list(token)
                     if user and skins:
+                        ton = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 0) + float(user['withdrawableBalance'])
+                        usdt = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1) + float(user['withdrawableUSDTBalance'])
                         total_wton += float(user['tokenBalance'])
-                        total_ton += sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 0)
-                        total_usdt += sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1)
+                        total_ton += ton
+                        total_usdt += usdt
 
         return total_wton, total_ton, total_usdt
                 
