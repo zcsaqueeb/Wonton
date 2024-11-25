@@ -749,6 +749,25 @@ class Wonton:
                 else:
                     return None
                 
+    def calculate_balance(self, queries):
+        total_wton = 0
+        total_ton = 0
+        total_usdt = 0
+
+        for query in queries:
+            query = query.strip()
+            if query:
+                token = self.user_auth(query)
+                if token:
+                    user = self.user_data(token)
+                    skins = self.skins_list(token)
+                    if user and skins:
+                        total_wton += float(user['tokenBalance'])
+                        total_ton += sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 0)
+                        total_usdt += sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1)
+
+        return total_wton, total_ton, total_usdt
+                
     def question(self):
         while True:
             purchase_box = input("Auto Purchase & Open Basic Box? [y/n] -> ").strip().lower()
@@ -1450,7 +1469,7 @@ class Wonton:
 
     def main(self):
         try:
-            with open("data.txt", "r") as file:
+            with open("query.txt", "r") as file:
                 queries = [line.strip() for line in file if line.strip()]
 
             purchase_box = self.question()
@@ -1470,6 +1489,19 @@ class Wonton:
                         self.process_query(query, purchase_box)
                         self.log(f"{Fore.CYAN + Style.BRIGHT}-{Style.RESET_ALL}"*75)
                         time.sleep(3)
+
+                total_wton, total_ton, total_usdt = self.calculate_balance(queries)
+                self.log(
+                    f"{Fore.CYAN+Style.BRIGHT}[ Account's Total{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {len(queries)} {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}][ Balance's Total{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {total_wton} $WTON {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}-{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {total_ton:.4f} $TON {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}-{Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {total_usdt:.4f} $USDT {Style.RESET_ALL}"
+                    f"{Fore.CYAN+Style.BRIGHT}]{Style.RESET_ALL}"
+                )
 
                 seconds = 1800
                 while seconds > 0:
