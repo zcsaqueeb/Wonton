@@ -762,9 +762,17 @@ class Wonton:
                     user = self.user_data(token)
                     skins = self.skins_list(token)
                     if user and skins:
-                        ton = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 0) + float(user['withdrawableBalance'])
-                        usdt = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1) + float(user['withdrawableUSDTBalance'])
-                        total_wton += float(user['tokenBalance'])
+                        ton = sum(
+                            float(item["value"]) * item["inventory"]
+                            for item in skins if item["sellToken"] == 0
+                        ) + float(user['withdrawableBalance'] or 0)
+
+                        usdt = sum(
+                            float(item["value"]) * item["inventory"]
+                            for item in skins if item["sellToken"] == 1
+                        ) + float(user['withdrawableUSDTBalance'] or 0)
+
+                        total_wton += float(user['tokenBalance'] or 0)
                         total_ton += ton
                         total_usdt += usdt
 
@@ -1450,15 +1458,22 @@ class Wonton:
 
                 skins = self.skins_list(token)
                 if skins:
-                    have_ton = sum(float(item["value"]) * item["inventory"]  for item in skins if item["sellToken"] == 0)
-                    have_usdt = sum(float(item["value"]) * item["inventory"] for item in skins if item["sellToken"] == 1)
+                    ton = sum(
+                        float(item["value"]) * item["inventory"]
+                        for item in skins if item["sellToken"] == 0
+                    ) + float(user['withdrawableBalance'] or 0)
+
+                    usdt = sum(
+                        float(item["value"]) * item["inventory"]
+                        for item in skins if item["sellToken"] == 1
+                    ) + float(user['withdrawableUSDTBalance'] or 0)
 
                     self.log(
                         f"{Fore.MAGENTA+Style.BRIGHT}[ Info:{Style.RESET_ALL}"
                         f"{Fore.WHITE+Style.BRIGHT} This Account Have {Style.RESET_ALL}"
-                        f"{Fore.CYAN+Style.BRIGHT}{have_ton:.4f} $TON{Style.RESET_ALL}"
+                        f"{Fore.CYAN+Style.BRIGHT}{ton:.4f} $TON{Style.RESET_ALL}"
                         f"{Fore.WHITE+Style.BRIGHT} and {Style.RESET_ALL}"
-                        f"{Fore.CYAN+Style.BRIGHT}{have_usdt:.4f} $USDT{Style.RESET_ALL}"
+                        f"{Fore.CYAN+Style.BRIGHT}{usdt:.4f} $USDT{Style.RESET_ALL}"
                         f"{Fore.WHITE+Style.BRIGHT} From Wonton's Skins {Style.RESET_ALL}"
                         f"{Fore.MAGENTA+Style.BRIGHT}]{Style.RESET_ALL}"
                     )
