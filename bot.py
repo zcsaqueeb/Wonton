@@ -340,8 +340,7 @@ def purchase_basicbox(self, token: str, amount: int, retries=5):
             print(f"Failed to purchase basic box. Status code: {response.status_code}. Retrying...")
     print("Exceeded maximum retries. Purchase failed.")
     return None
-
-
+    
         for attempt in range(retries):
             try:
                 response = self.session.post(url, headers=self.headers, data=data)
