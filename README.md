@@ -1,7 +1,7 @@
 # Wonton BOT
 Wonton BOT
 
-Register Here : [Wonton](https://t.me/WontonOrgBot/gameapp?startapp=referralCode=XE9DB2JV)
+Register Here : [Wonton](https://t.me/WontonOrgBot/gameapp?startapp=referralCode=FWYCC01I)
 
 ## Fitur
 
