@@ -323,13 +323,24 @@ class Wonton:
                 else:
                     return None
         
-    def purchase_basicbox(self, token: str, amount: int, retries=5):
-        url = f"{self.base_url}/shop/purchase-basic-box"
-        data = json.dumps({"purchaseAmount":amount})
-        self.headers.update({
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        })
+def purchase_basicbox(self, token: str, amount: int, retries=5):
+    url = f"{self.base_url}/shop/purchase-basic-box"
+    data = json.dumps({"purchaseAmount": amount})
+    self.headers.update({
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    })
+
+    for _ in range(retries):
+        response = self.session.post(url, headers=self.headers, data=data)
+        if response.status_code == 200:
+            print("Successfully purchased and opened basic box.")
+            return response.json()
+        else:
+            print(f"Failed to purchase basic box. Status code: {response.status_code}. Retrying...")
+    print("Exceeded maximum retries. Purchase failed.")
+    return None
+
 
         for attempt in range(retries):
             try:
